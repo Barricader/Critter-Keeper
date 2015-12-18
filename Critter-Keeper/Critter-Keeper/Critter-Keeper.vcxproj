@@ -155,6 +155,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Critter-Keeper.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\hello.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
