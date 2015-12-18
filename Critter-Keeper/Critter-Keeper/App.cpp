@@ -8,5 +8,8 @@ int main() {
 
 	cout << myApp.getMessage() << endl;
 
+	cin.get();
+	cin.ignore();
+
 	return 0;
 }
