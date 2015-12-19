@@ -17,11 +17,15 @@ void App::init() {
 	// Creating the window object
 	window = SDL_CreateWindow("Critter Keeper", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
 
+	// Creating renderer
+	rend = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	SDL_SetRenderDrawColor(rend, 200, 200, 200, 255);
+
 	// Creating a surface to draw on from the window
-	surf = SDL_GetWindowSurface(window);
+	//surf = SDL_GetWindowSurface(window);
 
 	// Creating a black background
-	SDL_FillRect(surf, NULL, SDL_MapRGB(surf->format, 200, 200, 200));
+	//SDL_FillRect(surf, NULL, SDL_MapRGB(surf->format, 200, 200, 200));
 
 	// Update the surface
 	SDL_UpdateWindowSurface(window);
@@ -30,7 +34,7 @@ void App::init() {
 }
 
 void App::loadAll() {
-	hello = loadImage("res\\hello.png");
+	curText = loadTexture("res\\hello.png");
 
 	cout << "Loaded all required images" << endl;
 }
@@ -46,12 +50,27 @@ void App::update() {
 		if (Keyboard::left) {
 			cout << "LEFT" << endl;
 		}
+		if (Keyboard::right) {
+			cout << "RIGHT" << endl;
+		}
+		if (Keyboard::up) {
+			cout << "UP" << endl;
+		}
+		if (Keyboard::down) {
+			cout << "DOWN" << endl;
+		}
 
-		// Draw all surfaces
-		SDL_BlitSurface(hello, NULL, surf, NULL);
-
-		// Update the window surface
-		SDL_UpdateWindowSurface(window);
+		SDL_RenderClear(rend);
+		int tempW;
+		int tempH;
+		SDL_QueryTexture(curText, NULL, NULL, &tempW, &tempH);
+		SDL_Rect tempRect;
+		tempRect.x = 0;
+		tempRect.y = 0;
+		tempRect.w = tempW;
+		tempRect.h = tempH;
+		SDL_RenderCopy(rend, curText, NULL, &tempRect);
+		SDL_RenderPresent(rend);
 	}
 }
 
@@ -72,13 +91,33 @@ SDL_Surface* App::loadImage(std::string path) {
 	return newSurf;
 }
 
+SDL_Texture* App::loadTexture(std::string path) {
+	SDL_Texture* newText = NULL;
+
+	SDL_Surface* loaded = IMG_Load(path.c_str());
+	if (loaded == NULL) {
+		cerr << "Unable to load image " << path.c_str() << "! SDL_Image Error: " << IMG_GetError() << endl;
+	}
+	else {
+		newText = SDL_CreateTextureFromSurface(rend, loaded);
+		SDL_FreeSurface(loaded);
+	}
+
+	cout << "Loaded image: " << path << endl;
+
+	return newText;
+}
+
 void App::exit() {
+	SDL_DestroyTexture(curText);
+	SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow(window);
 	SDL_FreeSurface(surf);
 	SDL_FreeSurface(hello);
 
 	keyThread.join();
 
+	IMG_Quit();
 	SDL_Quit();
 	
 	cout << "Freeing surfaces and window\nExiting SDL" << endl;

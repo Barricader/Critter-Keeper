@@ -15,7 +15,7 @@ class App {
 		SDL_Renderer* rend = NULL;
 		SDL_Surface* surf = NULL;
 		SDL_Surface* hello = NULL;
-		SDL_Surface* curSurf = NULL;
+		SDL_Texture* curText = NULL;
 
 	public:
 		const int WIDTH = 1280;
@@ -30,6 +30,7 @@ class App {
 		void update();
 
 		SDL_Surface* loadImage(std::string path);
+		SDL_Texture* loadTexture(std::string path);
 
 		void exit();
 
