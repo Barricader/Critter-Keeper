@@ -2,16 +2,20 @@
 #include <string>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <thread>
+#include <iostream>
+#include "Keyboard.h"
 
 class App {
 	private:
 		std::string message;
-		bool running;
+		static bool running;
 		SDL_Event ev;
 		SDL_Window* window = NULL;
 		SDL_Renderer* rend = NULL;
 		SDL_Surface* surf = NULL;
 		SDL_Surface* hello = NULL;
+		SDL_Surface* curSurf = NULL;
 
 	public:
 		const int WIDTH = 1280;
@@ -43,5 +47,9 @@ class App {
 
 		SDL_Surface* getHello() {
 			return hello;
+		}
+
+		static void setRunning(bool running) {
+			App::running = running;
 		}
 };

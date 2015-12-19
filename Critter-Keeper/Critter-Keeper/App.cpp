@@ -1,14 +1,16 @@
-#include <iostream>
 #include "App.h"
 
 using namespace std;
 
+std::thread keyThread;
+bool App::running = true;
+
 App::App(std::string text) {
 	message = text;
-	running = true;
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_PNG);
-	cout << "Initialized SDL" << endl;
+	keyThread = std::thread(&Keyboard::poll);
+	cout << "Initialized SDL and keyboard" << endl;
 }
 
 void App::init() {
@@ -41,6 +43,10 @@ void App::update() {
 			}
 		}
 
+		if (Keyboard::left) {
+			cout << "LEFT" << endl;
+		}
+
 		// Draw all surfaces
 		SDL_BlitSurface(hello, NULL, surf, NULL);
 
@@ -71,6 +77,8 @@ void App::exit() {
 	SDL_FreeSurface(surf);
 	SDL_FreeSurface(hello);
 
+	keyThread.join();
+
 	SDL_Quit();
 	
 	cout << "Freeing surfaces and window\nExiting SDL" << endl;
@@ -83,10 +91,7 @@ int main(int argc, char* argv[]) {
 
 	myApp.update();
 
-	cout << myApp.getMessage() << endl;
-
-	//cin.get();
-	//cin.ignore();
+	//cout << myApp.getMessage() << endl;
 
 	myApp.exit();
 
