@@ -4,24 +4,27 @@
 #include <SDL_image.h>
 #include <thread>
 #include <iostream>
+#include <vector>
+#include <ctime>
 #include "Keyboard.h"
+#include "Entity.h"
+#include "Player.h"
 
 class App {
 	private:
-		std::string message;
 		static bool running;
 		SDL_Event ev;
 		SDL_Window* window = NULL;
-		SDL_Renderer* rend = NULL;
-		SDL_Surface* surf = NULL;
-		SDL_Surface* hello = NULL;
+		static SDL_Renderer* rend;
 		SDL_Texture* curText = NULL;
+		std::vector<Entity*> entities;
+		Player* player;
 
 	public:
 		const int WIDTH = 1280;
 		const int HEIGHT = 720;
 
-		App(std::string text);
+		App();
 
 		void init();
 
@@ -29,25 +32,16 @@ class App {
 
 		void update();
 
-		SDL_Surface* loadImage(std::string path);
 		SDL_Texture* loadTexture(std::string path);
 
 		void exit();
-
-		std::string getMessage() {
-			return message;
-		}
 
 		SDL_Window* getWindow() {
 			return window;
 		}
 
-		SDL_Surface* getSurf() {
-			return surf;
-		}
-
-		SDL_Surface* getHello() {
-			return hello;
+		static SDL_Renderer* getRend() {
+			return rend;
 		}
 
 		static void setRunning(bool running) {

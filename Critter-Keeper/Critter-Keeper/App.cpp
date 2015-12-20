@@ -1,12 +1,18 @@
 #include "App.h"
+/**
+	@author Jo
+	@purpose Actual app and start of game flow
+*/
 
 using namespace std;
 
 std::thread keyThread;
 bool App::running = true;
+SDL_Renderer* App::rend = NULL;
 
-App::App(std::string text) {
-	message = text;
+// TODO: clean up all this
+
+App::App() {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_PNG);
 	keyThread = std::thread(&Keyboard::poll);
@@ -21,16 +27,14 @@ void App::init() {
 	rend = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	SDL_SetRenderDrawColor(rend, 200, 200, 200, 255);
 
-	// Creating a surface to draw on from the window
-	//surf = SDL_GetWindowSurface(window);
-
-	// Creating a black background
-	//SDL_FillRect(surf, NULL, SDL_MapRGB(surf->format, 200, 200, 200));
-
 	// Update the surface
 	SDL_UpdateWindowSurface(window);
 
 	cout << "Initialized window and window surface" << endl;
+
+	player = new Player("res\\p.png", 20, 40, 32, 32);
+	cout << player->getSprite()->getSize()->w << endl;
+	entities.push_back(player);
 }
 
 void App::loadAll() {
@@ -40,6 +44,7 @@ void App::loadAll() {
 }
 
 void App::update() {
+	clock_t start = clock();
 	while (running) {
 		while (SDL_PollEvent(&ev) != 0) {
 			if (ev.type == SDL_QUIT) {
@@ -47,48 +52,58 @@ void App::update() {
 			}
 		}
 
-		if (Keyboard::left) {
-			cout << "LEFT" << endl;
-		}
-		if (Keyboard::right) {
-			cout << "RIGHT" << endl;
-		}
-		if (Keyboard::up) {
-			cout << "UP" << endl;
-		}
-		if (Keyboard::down) {
-			cout << "DOWN" << endl;
+		// update all entities here
+		clock_t now = clock();
+		if (now - start >= 16.666) {
+			start = clock();
+			if (Keyboard::left) {
+				cout << "l";
+				player->move(player->getX() - 2, player->getY());
+			}
+			if (Keyboard::right) {
+				player->move(player->getX() + 2, player->getY());
+			}
+			if (Keyboard::up) {
+
+				player->move(player->getX(), player->getY() - 2);
+			}
+			if (Keyboard::down) {
+
+				player->move(player->getX(), player->getY() + 2);
+			}
 		}
 
+		// Render all entities below
 		SDL_RenderClear(rend);
+
 		int tempW;
 		int tempH;
 		SDL_QueryTexture(curText, NULL, NULL, &tempW, &tempH);
 		SDL_Rect tempRect;
-		tempRect.x = 0;
-		tempRect.y = 0;
+		tempRect.x = 30;
+		tempRect.y = 30;
 		tempRect.w = tempW;
 		tempRect.h = tempH;
+
 		SDL_RenderCopy(rend, curText, NULL, &tempRect);
+
+		for (int i = 0; i < entities.size(); i++) {
+			int tW;
+			int tH;
+			SDL_QueryTexture(entities[i]->getSprite()->getTexture(), NULL, NULL, &tW, &tH);
+			SDL_Rect tR;
+			tR.x = entities[i]->getX();
+			tR.y = entities[i]->getY();
+			tR.w = tW;
+			tR.h = tH;
+
+			SDL_RenderCopy(rend, entities[i]->getSprite()->getTexture(), NULL, &tR);
+		}
+
+		// Have a render loop here
+
 		SDL_RenderPresent(rend);
 	}
-}
-
-SDL_Surface* App::loadImage(std::string path) {
-	SDL_Surface* newSurf = NULL;
-
-	SDL_Surface* loaded = IMG_Load(path.c_str());
-	if (loaded == NULL) {
-		cerr << "Unable to load image " << path.c_str() << "! SDL_Image Error: " << IMG_GetError() << endl;
-	}
-	else {
-		newSurf = SDL_ConvertSurface(loaded, surf->format, NULL);
-		SDL_FreeSurface(loaded);
-	}
-
-	cout << "Loaded image: " << path << endl;
-
-	return newSurf;
 }
 
 SDL_Texture* App::loadTexture(std::string path) {
@@ -112,8 +127,8 @@ void App::exit() {
 	SDL_DestroyTexture(curText);
 	SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow(window);
-	SDL_FreeSurface(surf);
-	SDL_FreeSurface(hello);
+
+	delete player;
 
 	keyThread.join();
 
@@ -124,13 +139,11 @@ void App::exit() {
 }
 
 int main(int argc, char* argv[]) {
-	App myApp = App("Hello");
+	App myApp = App();
 	myApp.init();
 	myApp.loadAll();
 
 	myApp.update();
-
-	//cout << myApp.getMessage() << endl;
 
 	myApp.exit();
 

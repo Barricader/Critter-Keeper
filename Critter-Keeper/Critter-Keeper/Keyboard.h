@@ -6,11 +6,10 @@ class Keyboard {
 		static SDL_Event ev;
 
 	public:
-		static bool keys[255];
-		static bool left;
-		static bool right;
-		static bool up;
-		static bool down;
+		static bool left, right, up, down;
+		//static bool right;
+		//static bool up;
+		//static bool down;
 
 		Keyboard();
 

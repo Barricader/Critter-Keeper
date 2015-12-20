@@ -77,8 +77,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\jjone\Documents\SDL2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\jjone\Documents\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\JoJones\Documents\SDL2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\JoJones\Documents\SDL2\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -152,12 +152,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Keyboard.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="Tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="Keyboard.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="Tile.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Critter-Keeper.rc" />
