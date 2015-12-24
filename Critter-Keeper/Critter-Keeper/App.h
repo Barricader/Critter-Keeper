@@ -22,6 +22,7 @@ class App {
 		std::vector<Entity*> entities;
 		Player* player;
 		Map* curMap;
+		int xOffset, yOffset;
 
 	public:
 		const int WIDTH = 1280;
@@ -49,5 +50,9 @@ class App {
 
 		static void setRunning(bool running) {
 			App::running = running;
+		}
+
+		dVector getOffset() {
+			return dVector(xOffset, yOffset);
 		}
 };

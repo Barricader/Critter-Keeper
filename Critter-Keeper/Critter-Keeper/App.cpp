@@ -10,7 +10,7 @@ std::thread keyThread;
 bool App::running = true;
 SDL_Renderer* App::rend = NULL;
 
-// TODO: clean up all this
+// TODO: clean up all this e.g. put into folders, clean up code, use better standards, etc
 // TODO: add destructors and start allocating to heap and deleting object once their usage is over
 // TODO: remove player class and enable wasd/arrows/mouse to move camera around
 
@@ -34,14 +34,16 @@ void App::init() {
 
 	cout << "Initialized window and window surface" << endl;
 
-	player = new Player("res\\p.png", 20, 40, 32, 32);
-	cout << player->getSprite()->getSize()->w << endl;
-	entities.push_back(player);
+	//player = new Player("res\\p.png", 20, 40, 32, 32);
+	//cout << player->getSprite()->getSize()->w << endl;
+	//entities.push_back(player);
 }
 
 void App::loadAll() {
 	curText = loadTexture("res\\hello.png");
-	curMap = &Map("res\\map1.json");
+	curMap = new Map("res\\m.json");
+
+	cout << "IEWOIGTE: " << curMap->getTiles()->size() << endl;
 
 	cout << "Loaded all required images" << endl;
 }
@@ -60,39 +62,79 @@ void App::update() {
 		if (now - start >= 16.666) {
 			start = clock();
 			if (Keyboard::left) {
-				cout << "l";
-				player->move(player->getPos().dX - 2, player->getPos().dY);
+				//player->move(player->getPos().dX - 2, player->getPos().dY);
+				xOffset -= 2;
 			}
 			if (Keyboard::right) {
-				player->move(player->getPos().dX + 2, player->getPos().dY);
+				//player->move(player->getPos().dX + 2, player->getPos().dY);
+				xOffset += 2;
 			}
 			if (Keyboard::up) {
-
-				player->move(player->getPos().dX, player->getPos().dY - 2);
+				//player->move(player->getPos().dX, player->getPos().dY - 2);
+				yOffset -= 2;
 			}
 			if (Keyboard::down) {
-
-				player->move(player->getPos().dX, player->getPos().dY + 2);
+				//player->move(player->getPos().dX, player->getPos().dY + 2);
+				yOffset += 2;
 			}
 		}
 
 		// Render all entities below
 		SDL_RenderClear(rend);
 
-		int tempW;
-		int tempH;
-		SDL_QueryTexture(curText, NULL, NULL, &tempW, &tempH);
-		SDL_Rect tempRect;
-		tempRect.x = 30;
-		tempRect.y = 30;
-		tempRect.w = tempW;
-		tempRect.h = tempH;
+		//int tempW;
+		//int tempH;
+		//SDL_QueryTexture(curText, NULL, NULL, &tempW, &tempH);
+		//SDL_Rect tempRect;
+		//tempRect.x = 30;
+		//tempRect.y = 30;
+		//tempRect.w = tempW;
+		//tempRect.h = tempH;
 
-		SDL_RenderCopy(rend, curText, NULL, &tempRect);
+		//SDL_RenderCopy(rend, curText, NULL, &tempRect);
 
 		// get the path from the curMap
 		// render each tile here, have the tile sprite based on the state
-		// e.g. if state == 1 then draw tile 0,32 on the spritesheet
+		// e.g. if state == 2 then draw tile 0,32 on the spritesheet
+		for (int i = 0; i < curMap->getTiles()->size(); i++) {
+			SDL_Rect tR;
+			tR.x = curMap->getTiles()->at(i).getPos().dX - xOffset;
+			tR.y = curMap->getTiles()->at(i).getPos().dY - yOffset;
+			tR.w = 32;
+			tR.h = 32;
+
+			SDL_Rect tR2;
+			
+			if (curMap->getTiles()->at(i).getState() == 1) {
+				tR2.x = 0;
+				tR2.y = 0;
+			}
+			if (curMap->getTiles()->at(i).getState() == 2) {
+				tR2.x = 32;
+				tR2.y = 0;
+			}
+			if (curMap->getTiles()->at(i).getState() == 3) {
+				tR2.x = 64;
+				tR2.y = 0;
+			}
+			if (curMap->getTiles()->at(i).getState() == 4) {
+				tR2.x = 0;
+				tR2.y = 32;
+			}
+			if (curMap->getTiles()->at(i).getState() == 5) {
+				tR2.x = 32;
+				tR2.y = 32;
+			}
+			if (curMap->getTiles()->at(i).getState() == 6) {
+				tR2.x = 64;
+				tR2.y = 32;
+			}
+
+			tR2.w = 32;
+			tR2.h = 32;
+
+			SDL_RenderCopy(rend, curMap->getSheet()->getTexture(), &tR2, &tR);
+		}
 
 		// TODO: only draw if the tile is on screen by check the x and ys of the tile and camera
 
@@ -107,6 +149,7 @@ void App::update() {
 			tR.h = tH;
 
 			SDL_RenderCopy(rend, entities[i]->getSprite()->getTexture(), NULL, &tR);
+			//SDL_RenderCopy(rend, curMap->getSheet()->getTexture(), NULL, &tR);
 		}
 
 		// Have a render loop here

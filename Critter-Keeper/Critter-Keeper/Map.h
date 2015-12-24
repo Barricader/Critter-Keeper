@@ -12,11 +12,21 @@
 class Map {
 	private:
 		Sprite* spritesheet;
-		std::vector<Tile> tiles;
+		//std::vector<Tile>* tiles = new std::vector<Tile>();
+		std::vector<Tile>* tiles = nullptr;
 
 	public:
 		Map();
 		Map(std::string path);
+		~Map();
 
-		void render();
+		//void render();
+
+		Sprite* getSheet() {
+			return spritesheet;
+		}
+
+		std::vector<Tile>* getTiles() {
+			return tiles;
+		}
 };

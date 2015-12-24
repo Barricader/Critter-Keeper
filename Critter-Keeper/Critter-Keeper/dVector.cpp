@@ -6,6 +6,10 @@ dVector::dVector() {
 	dY = 0.0;
 }
 
+dVector::~dVector() {
+
+}
+
 dVector::dVector(double dX, double dY) {
 	this->dX = dX;
 	this->dY = dY;

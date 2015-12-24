@@ -3,12 +3,13 @@
 using namespace rapidjson;
 using namespace std;
 
-std::string decompress_string(string str);
-string decompressString(string str);
-
 Map::Map() {
 	// Generate a random map
 
+}
+
+Map::~Map() {
+	delete tiles;
 }
 
 Map::Map(std::string path) {
@@ -55,7 +56,7 @@ Map::Map(std::string path) {
 	assert(doc["tilesets"][0]["image"].IsString());
 	
 	string imgPath = doc["tilesets"][0]["image"].GetString();
-	spritesheet = &Sprite(imgPath, 32, 32);
+	spritesheet = new Sprite("res\\" + imgPath, 32, 32);
 
 	// get data value from layers
 	assert(doc["layers"][0].HasMember("data"));
@@ -78,13 +79,18 @@ Map::Map(std::string path) {
 	// Generate tiles
 	// Due to me being super lazy, I will not be using the tilewidth and height from the json
 	// You can try if you want, the keys will be in the tilesets value array
+
+	tiles = new std::vector<Tile>();
+	//tiles = &vector<Tile>();
 	short k = 0;
 	for (int i = 0; i < 30; i++) {
 		for (int j = 0; j < 30; j++) {
-			tiles.push_back(Tile(imgPath, j * 32, i * 32, 32, 32, temp[k]));
+			tiles->push_back(Tile(imgPath, j * 32, i * 32, 32, 32, temp[k]));
 			k++;
 		}
 	}
+
+	cout << "test size: " << tiles->size() << endl;
 
 	delete[] temp;
 }

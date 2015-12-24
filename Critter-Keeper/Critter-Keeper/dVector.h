@@ -10,6 +10,7 @@ class dVector {
 
 		dVector();
 		dVector(double dX, double dY);
+		~dVector();
 
 		double length();
 		dVector add(dVector dV);
