@@ -14,10 +14,14 @@ Sprite* Entity::getSprite() {
 	return sprite;
 }
 
-int Entity::getX() {
-	return x;
+dVector Entity::getPos() {
+	return dVector(x, y);
 }
 
-int Entity::getY() {
-	return y;
-}
+//int Entity::getX() {
+//	return x;
+//}
+//
+//int Entity::getY() {
+//	return y;
+//}

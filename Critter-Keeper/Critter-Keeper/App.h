@@ -9,6 +9,8 @@
 #include "Keyboard.h"
 #include "Entity.h"
 #include "Player.h"
+#include "Map.h"
+#include "Tile.h"
 
 class App {
 	private:
@@ -19,6 +21,7 @@ class App {
 		SDL_Texture* curText = NULL;
 		std::vector<Entity*> entities;
 		Player* player;
+		Map* curMap;
 
 	public:
 		const int WIDTH = 1280;

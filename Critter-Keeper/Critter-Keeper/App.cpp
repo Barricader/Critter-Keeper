@@ -11,6 +11,8 @@ bool App::running = true;
 SDL_Renderer* App::rend = NULL;
 
 // TODO: clean up all this
+// TODO: add destructors and start allocating to heap and deleting object once their usage is over
+// TODO: remove player class and enable wasd/arrows/mouse to move camera around
 
 App::App() {
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -39,6 +41,7 @@ void App::init() {
 
 void App::loadAll() {
 	curText = loadTexture("res\\hello.png");
+	curMap = &Map("res\\map1.json");
 
 	cout << "Loaded all required images" << endl;
 }
@@ -58,18 +61,18 @@ void App::update() {
 			start = clock();
 			if (Keyboard::left) {
 				cout << "l";
-				player->move(player->getX() - 2, player->getY());
+				player->move(player->getPos().dX - 2, player->getPos().dY);
 			}
 			if (Keyboard::right) {
-				player->move(player->getX() + 2, player->getY());
+				player->move(player->getPos().dX + 2, player->getPos().dY);
 			}
 			if (Keyboard::up) {
 
-				player->move(player->getX(), player->getY() - 2);
+				player->move(player->getPos().dX, player->getPos().dY - 2);
 			}
 			if (Keyboard::down) {
 
-				player->move(player->getX(), player->getY() + 2);
+				player->move(player->getPos().dX, player->getPos().dY + 2);
 			}
 		}
 
@@ -87,13 +90,19 @@ void App::update() {
 
 		SDL_RenderCopy(rend, curText, NULL, &tempRect);
 
+		// get the path from the curMap
+		// render each tile here, have the tile sprite based on the state
+		// e.g. if state == 1 then draw tile 0,32 on the spritesheet
+
+		// TODO: only draw if the tile is on screen by check the x and ys of the tile and camera
+
 		for (int i = 0; i < entities.size(); i++) {
 			int tW;
 			int tH;
 			SDL_QueryTexture(entities[i]->getSprite()->getTexture(), NULL, NULL, &tW, &tH);
 			SDL_Rect tR;
-			tR.x = entities[i]->getX();
-			tR.y = entities[i]->getY();
+			tR.x = entities[i]->getPos().dX;
+			tR.y = entities[i]->getPos().dY;
 			tR.w = tW;
 			tR.h = tH;
 

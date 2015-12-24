@@ -1,5 +1,6 @@
 #pragma once
 #include "Sprite.h"
+#include "dVector.h"
 
 // This should be abstract
 class Entity {
@@ -16,6 +17,8 @@ class Entity {
 		virtual void render(SDL_Renderer* rend) = 0;
 		Sprite* getSprite();
 
-		int getX();
-		int getY();
+		dVector getPos();
+
+		//int getX();
+		//int getY();
 };
