@@ -83,8 +83,8 @@ Map::Map(std::string path) {
 	tiles = new std::vector<Tile>();
 	//tiles = &vector<Tile>();
 	short k = 0;
-	for (int i = 0; i < 30; i++) {
-		for (int j = 0; j < 30; j++) {
+	for (int i = 0; i < doc["layers"][0]["height"].GetInt(); i++) {
+		for (int j = 0; j < doc["layers"][0]["width"].GetInt(); j++) {
 			tiles->push_back(Tile(imgPath, j * 32, i * 32, 32, 32, temp[k]));
 			k++;
 		}

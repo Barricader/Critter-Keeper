@@ -25,8 +25,8 @@ void App::init() {
 	// Creating the window object
 	window = SDL_CreateWindow("Critter Keeper", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
 
-	// Creating renderer
-	rend = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	// Creating renderer     ---------> To disable vysnc, remove the right flag and the bitwise or
+	rend = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
 	SDL_SetRenderDrawColor(rend, 200, 200, 200, 255);
 
 	// Update the surface
@@ -41,9 +41,9 @@ void App::init() {
 
 void App::loadAll() {
 	curText = loadTexture("res\\hello.png");
-	curMap = new Map("res\\m.json");
+	curMap = new Map("res\\m2.json");
 
-	cout << "IEWOIGTE: " << curMap->getTiles()->size() << endl;
+	cout << "Checking for size of tile vector: " << curMap->getTiles()->size() << endl;
 
 	cout << "Loaded all required images" << endl;
 }
@@ -63,35 +63,24 @@ void App::update() {
 			start = clock();
 			if (Keyboard::left) {
 				//player->move(player->getPos().dX - 2, player->getPos().dY);
-				xOffset -= 2;
+				xOffset -= 3;
 			}
 			if (Keyboard::right) {
 				//player->move(player->getPos().dX + 2, player->getPos().dY);
-				xOffset += 2;
+				xOffset += 3;
 			}
 			if (Keyboard::up) {
 				//player->move(player->getPos().dX, player->getPos().dY - 2);
-				yOffset -= 2;
+				yOffset -= 3;
 			}
 			if (Keyboard::down) {
 				//player->move(player->getPos().dX, player->getPos().dY + 2);
-				yOffset += 2;
+				yOffset += 3;
 			}
 		}
 
 		// Render all entities below
 		SDL_RenderClear(rend);
-
-		//int tempW;
-		//int tempH;
-		//SDL_QueryTexture(curText, NULL, NULL, &tempW, &tempH);
-		//SDL_Rect tempRect;
-		//tempRect.x = 30;
-		//tempRect.y = 30;
-		//tempRect.w = tempW;
-		//tempRect.h = tempH;
-
-		//SDL_RenderCopy(rend, curText, NULL, &tempRect);
 
 		// get the path from the curMap
 		// render each tile here, have the tile sprite based on the state
@@ -105,6 +94,9 @@ void App::update() {
 
 			SDL_Rect tR2;
 			
+			// TODO: change the multiples of 32 and harcode it and just multiply it
+			// e.g. curMap->getSheet()->getSpriteSize() * X; WHERE X = like 0, 1, or 2
+
 			if (curMap->getTiles()->at(i).getState() == 1) {
 				tR2.x = 0;
 				tR2.y = 0;
@@ -179,6 +171,14 @@ void App::exit() {
 	SDL_DestroyTexture(curText);
 	SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow(window);
+
+	/*&	TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+	*
+	*	Make sure to free up all the textures and well, basically everything that is on the heap
+	*	This should prevent memory leaks and make the program run smoother in the future
+	*
+	*	TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+	*/
 
 	delete player;
 
