@@ -56,7 +56,15 @@ Map::Map(std::string path) {
 	assert(doc["tilesets"][0]["image"].IsString());
 	
 	string imgPath = doc["tilesets"][0]["image"].GetString();
-	spritesheet = new Sprite("res\\" + imgPath, 32, 32);
+	spritesheet = new Sprite("res\\" + imgPath, doc["tilesets"][0]["imagewidth"].GetInt(), doc["tilesets"][0]["imageheight"].GetInt());
+
+	// Tile size stuff
+	assert(doc["tilesets"][0].HasMember("tilewidth"));
+	assert(doc["tilesets"][0]["tilewidth"].IsInt());
+	assert(doc["tilesets"][0].HasMember("tileheight"));
+	assert(doc["tilesets"][0]["tileheight"].IsInt());
+	int tileWidth = doc["tilesets"][0]["tilewidth"].GetInt();
+	int tileHeight = doc["tilesets"][0]["tileheight"].GetInt();
 
 	// get data value from layers
 	assert(doc["layers"][0].HasMember("data"));
@@ -85,7 +93,7 @@ Map::Map(std::string path) {
 	short k = 0;
 	for (int i = 0; i < doc["layers"][0]["height"].GetInt(); i++) {
 		for (int j = 0; j < doc["layers"][0]["width"].GetInt(); j++) {
-			tiles->push_back(Tile(imgPath, j * 32, i * 32, 32, 32, temp[k]));
+			tiles->push_back(Tile(imgPath, j * tileWidth, i * tileHeight, tileWidth, tileHeight, temp[k]));
 			k++;
 		}
 	}

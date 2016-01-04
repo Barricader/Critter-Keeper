@@ -12,6 +12,10 @@
 #include "Map.h"
 #include "Tile.h"
 
+enum TILE_STATE { TILE_NULL = 0, TILE_DIRT, TILE_DIRT_GOLD, TILE_WALL, TILE_WALL_GOLD, TILE_WALL_UNBREAK,
+				  TILE_BARRACKS, TILE_TRAINING, TILE_HOSPITAL, TILE_STATE_SIZE};
+enum TILE_VAR { VAR_DEFAULT = 0, VAR_1, VAR_2, VAR_3, VAR_4 };
+
 class App {
 	private:
 		static bool running;

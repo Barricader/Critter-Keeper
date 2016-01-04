@@ -14,6 +14,19 @@ SDL_Renderer* App::rend = NULL;
 // TODO: add destructors and start allocating to heap and deleting object once their usage is over
 // TODO: remove player class and enable wasd/arrows/mouse to move camera around
 
+// TODO: Decide how to handle tile drawing, we can decide to create a ton of values in the TILE_STATE enum
+// or we can decide to create another variable in the tile where it will be a variation of that tile
+// like a barracks tile can have a regular wood floor sprite tile, or a bed sprite tile, or table, etc
+
+// TODO: Depending on the size of the room, that will decide on what variation tile will go where
+// i.e. if it is a 5x5 room, it might have a bed sprite in the (1, 0) and (3, 0) coords where (0,0) is the
+// top left of the room
+
+// In the spritesheet the columns will be seperate tile sprites i.e. dirt tile, barracks tile
+// The row of each column will be the variations of each tile sprite
+
+// The variation tiles will probably not have collision to make it easier to build rooms
+
 App::App() {
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_PNG);
@@ -34,6 +47,7 @@ void App::init() {
 
 	cout << "Initialized window and window surface" << endl;
 
+	// TODO: Remove this and the Player class, we do not have a player
 	//player = new Player("res\\p.png", 20, 40, 32, 32);
 	//cout << player->getSprite()->getSize()->w << endl;
 	//entities.push_back(player);
@@ -41,7 +55,7 @@ void App::init() {
 
 void App::loadAll() {
 	curText = loadTexture("res\\hello.png");
-	curMap = new Map("res\\m2.json");
+	curMap = new Map("res\\dirtMap.json");
 
 	cout << "Checking for size of tile vector: " << curMap->getTiles()->size() << endl;
 
@@ -62,89 +76,119 @@ void App::update() {
 		if (now - start >= 16.666) {
 			start = clock();
 			if (Keyboard::left) {
-				//player->move(player->getPos().dX - 2, player->getPos().dY);
 				xOffset -= 3;
 			}
 			if (Keyboard::right) {
-				//player->move(player->getPos().dX + 2, player->getPos().dY);
 				xOffset += 3;
 			}
 			if (Keyboard::up) {
-				//player->move(player->getPos().dX, player->getPos().dY - 2);
 				yOffset -= 3;
 			}
 			if (Keyboard::down) {
-				//player->move(player->getPos().dX, player->getPos().dY + 2);
 				yOffset += 3;
 			}
 		}
 
-		// Render all entities below
+		// Render loop
 		SDL_RenderClear(rend);
 
 		// get the path from the curMap
 		// render each tile here, have the tile sprite based on the state
 		// e.g. if state == 2 then draw tile 0,32 on the spritesheet
 		for (int i = 0; i < curMap->getTiles()->size(); i++) {
-			SDL_Rect tR;
-			tR.x = curMap->getTiles()->at(i).getPos().dX - xOffset;
-			tR.y = curMap->getTiles()->at(i).getPos().dY - yOffset;
-			tR.w = 32;
-			tR.h = 32;
+			if (curMap->getTiles()->at(i).getPos().dX - xOffset + curMap->getTiles()->at(i).getSize().w > 0 ||
+				curMap->getTiles()->at(i).getPos().dX - xOffset < WIDTH ||
+				curMap->getTiles()->at(i).getPos().dY - yOffset + curMap->getTiles()->at(i).getSize().h > 0 ||
+				curMap->getTiles()->at(i).getPos().dY - yOffset < HEIGHT) {
+				SDL_Rect tR;
+				tR.x = curMap->getTiles()->at(i).getPos().dX - xOffset;
+				tR.y = curMap->getTiles()->at(i).getPos().dY - yOffset;
+				tR.w = 32;
+				tR.h = 32;
 
-			SDL_Rect tR2;
-			
-			// TODO: change the multiples of 32 and harcode it and just multiply it
-			// e.g. curMap->getSheet()->getSpriteSize() * X; WHERE X = like 0, 1, or 2
+				SDL_Rect tR2;
 
-			if (curMap->getTiles()->at(i).getState() == 1) {
-				tR2.x = 0;
-				tR2.y = 0;
-			}
-			if (curMap->getTiles()->at(i).getState() == 2) {
-				tR2.x = 32;
-				tR2.y = 0;
-			}
-			if (curMap->getTiles()->at(i).getState() == 3) {
-				tR2.x = 64;
-				tR2.y = 0;
-			}
-			if (curMap->getTiles()->at(i).getState() == 4) {
-				tR2.x = 0;
-				tR2.y = 32;
-			}
-			if (curMap->getTiles()->at(i).getState() == 5) {
-				tR2.x = 32;
-				tR2.y = 32;
-			}
-			if (curMap->getTiles()->at(i).getState() == 6) {
-				tR2.x = 64;
-				tR2.y = 32;
-			}
+				// TODO: change the multiples of 32 and make a const variable based on the size of the current tile set
+				// e.g. curMap->getSheet()->getSpriteSize() * X; WHERE X = like 0, 1, or 2
 
-			tR2.w = 32;
-			tR2.h = 32;
+				// TODO: create this where the x and ys are not hard coded but are gotten from the json and calculated by the sprite sheet widht and height
+				int tW;
+				int tH;
+				SDL_QueryTexture(curMap->getSheet()->getTexture(), NULL, NULL, &tW, &tH);
 
-			SDL_RenderCopy(rend, curMap->getSheet()->getTexture(), &tR2, &tR);
+				//for (int j = 1; j < TILE_STATE_SIZE; j++) {
+				//	if (curMap->getTiles()->at(i).getState() == j) {
+				//		//if (j == tH / curMap->get)
+				//		//tR2.x = tW % i * TILESIZE;
+				//		tR2.x = ((j-1) * curMap->getTiles()->at(i).getSize().w) % curMap->getSheet()->getSize()->w;
+				//		tR2.y = ((j-1) * curMap->getTiles()->at(i).getSize().w) / curMap->getSheet()->getSize()->w;
+				//	}
+				//}
+
+
+				if (curMap->getTiles()->at(i).getState() != 0) {
+					//cout << (curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w << endl;
+					tR2.x = ((curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w) % curMap->getSheet()->getSize()->w;
+					tR2.y = ((curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w) / curMap->getSheet()->getSize()->w;
+				}
+				else {
+					tR2.x = 1028;
+					tR2.y = 1028;
+				}
+				
+				// Draw a specific tile from the sheet based on the tile state
+				//if (curMap->getTiles()->at(i).getState() == 1) {
+				//	tR2.x = 0;
+				//	tR2.y = 0;
+				//}
+				//if (curMap->getTiles()->at(i).getState() == 2) {
+				//	tR2.x = 32;
+				//	tR2.y = 0;
+				//}
+				//if (curMap->getTiles()->at(i).getState() == 3) {
+				//	tR2.x = 64;
+				//	tR2.y = 0;
+				//}
+				//if (curMap->getTiles()->at(i).getState() == 4) {
+				//	tR2.x = 0;
+				//	tR2.y = 32;
+				//}
+				//if (curMap->getTiles()->at(i).getState() == 5) {
+				//	tR2.x = 32;
+				//	tR2.y = 32;
+				//}
+				//if (curMap->getTiles()->at(i).getState() == 6) {
+				//	tR2.x = 64;
+				//	tR2.y = 32;
+				//}
+
+				
+				tR2.w = 32;
+				tR2.h = 32;
+
+				SDL_RenderCopy(rend, curMap->getSheet()->getTexture(), &tR2, &tR);
+			}
 		}
 
-		// TODO: only draw if the tile is on screen by check the x and ys of the tile and camera
+		// TODO: only draw if the entity is on screen by check the x and ys of the entity and camera -> DONE?
 
 		for (int i = 0; i < entities.size(); i++) {
-			int tW;
-			int tH;
-			SDL_QueryTexture(entities[i]->getSprite()->getTexture(), NULL, NULL, &tW, &tH);
-			SDL_Rect tR;
-			tR.x = entities[i]->getPos().dX;
-			tR.y = entities[i]->getPos().dY;
-			tR.w = tW;
-			tR.h = tH;
+			if (entities[i]->getPos().dX - xOffset + entities[i]->getSize().w > 0 ||
+				entities[i]->getPos().dX - xOffset < WIDTH ||
+				entities[i]->getPos().dY - yOffset + entities[i]->getSize().h > 0 ||
+				entities[i]->getPos().dY - yOffset < HEIGHT) {
+				int tW;
+				int tH;
+				SDL_QueryTexture(entities[i]->getSprite()->getTexture(), NULL, NULL, &tW, &tH);
+				SDL_Rect tR;
+				tR.x = entities[i]->getPos().dX;
+				tR.y = entities[i]->getPos().dY;
+				tR.w = tW;
+				tR.h = tH;
 
-			SDL_RenderCopy(rend, entities[i]->getSprite()->getTexture(), NULL, &tR);
-			//SDL_RenderCopy(rend, curMap->getSheet()->getTexture(), NULL, &tR);
+				SDL_RenderCopy(rend, entities[i]->getSprite()->getTexture(), NULL, &tR);
+			}
 		}
-
-		// Have a render loop here
 
 		SDL_RenderPresent(rend);
 	}

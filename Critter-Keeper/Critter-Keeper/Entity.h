@@ -18,7 +18,5 @@ class Entity {
 		Sprite* getSprite();
 
 		dVector getPos();
-
-		//int getX();
-		//int getY();
+		SDL_Rect getSize();
 };

@@ -18,10 +18,6 @@ dVector Entity::getPos() {
 	return dVector(x, y);
 }
 
-//int Entity::getX() {
-//	return x;
-//}
-//
-//int Entity::getY() {
-//	return y;
-//}
+SDL_Rect Entity::getSize() {
+	return *sprite->getSize();
+}
