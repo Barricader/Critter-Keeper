@@ -2,6 +2,7 @@
 #include "Entity.h"
 
 // We don't need a player, this is just for testing
+// It is just here to see a semi-correct implementation of the Entity class
 class Player : public Entity {
 	private:
 		Sprite* sprite;

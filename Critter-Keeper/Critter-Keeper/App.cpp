@@ -48,6 +48,7 @@ void App::init() {
 	cout << "Initialized window and window surface" << endl;
 
 	// TODO: Remove this and the Player class, we do not have a player
+	// This is just here to show how to add an entity to the App class
 	//player = new Player("res\\p.png", 20, 40, 32, 32);
 	//cout << player->getSprite()->getSize()->w << endl;
 	//entities.push_back(player);
@@ -55,6 +56,7 @@ void App::init() {
 
 void App::loadAll() {
 	curText = loadTexture("res\\hello.png");
+	// TODO: fix error where it will send a nullptr exception if the file does not exist
 	curMap = new Map("res\\dirtMap.json");
 
 	cout << "Checking for size of tile vector: " << curMap->getTiles()->size() << endl;
@@ -94,7 +96,8 @@ void App::update() {
 
 		// get the path from the curMap
 		// render each tile here, have the tile sprite based on the state
-		// e.g. if state == 2 then draw tile 0,32 on the spritesheet
+		// e.g. if state == 2 then draw tile 0,TILESIZE (where TILESIZe is the size of the tile) on the spritesheet
+		// We are assuming that the tile width is the same as the tile height
 		for (int i = 0; i < curMap->getTiles()->size(); i++) {
 			if (curMap->getTiles()->at(i).getPos().dX - xOffset + curMap->getTiles()->at(i).getSize().w > 0 ||
 				curMap->getTiles()->at(i).getPos().dX - xOffset < WIDTH ||
@@ -103,68 +106,31 @@ void App::update() {
 				SDL_Rect tR;
 				tR.x = curMap->getTiles()->at(i).getPos().dX - xOffset;
 				tR.y = curMap->getTiles()->at(i).getPos().dY - yOffset;
-				tR.w = 32;
-				tR.h = 32;
+				tR.w = curMap->getTiles()->at(i).getSize().w;
+				tR.h = curMap->getTiles()->at(i).getSize().w;
 
 				SDL_Rect tR2;
-
-				// TODO: change the multiples of 32 and make a const variable based on the size of the current tile set
-				// e.g. curMap->getSheet()->getSpriteSize() * X; WHERE X = like 0, 1, or 2
 
 				// TODO: create this where the x and ys are not hard coded but are gotten from the json and calculated by the sprite sheet widht and height
 				int tW;
 				int tH;
 				SDL_QueryTexture(curMap->getSheet()->getTexture(), NULL, NULL, &tW, &tH);
 
-				//for (int j = 1; j < TILE_STATE_SIZE; j++) {
-				//	if (curMap->getTiles()->at(i).getState() == j) {
-				//		//if (j == tH / curMap->get)
-				//		//tR2.x = tW % i * TILESIZE;
-				//		tR2.x = ((j-1) * curMap->getTiles()->at(i).getSize().w) % curMap->getSheet()->getSize()->w;
-				//		tR2.y = ((j-1) * curMap->getTiles()->at(i).getSize().w) / curMap->getSheet()->getSize()->w;
-				//	}
-				//}
-
+				// TODO: Added an error check where it makes sure that the state is not greater than or equal to the max amount of tlies in the sheet from the json
 
 				if (curMap->getTiles()->at(i).getState() != 0) {
 					//cout << (curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w << endl;
 					tR2.x = ((curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w) % curMap->getSheet()->getSize()->w;
-					tR2.y = ((curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w) / curMap->getSheet()->getSize()->w;
+					tR2.y = (((curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w) / curMap->getSheet()->getSize()->w)  * curMap->getTiles()->at(i).getSize().w;
 				}
 				else {
-					tR2.x = 1028;
-					tR2.y = 1028;
+					// Give it a null tile sprite
+					tR2.x = -curMap->getTiles()->at(i).getSize().w;
+					tR2.y = -curMap->getTiles()->at(i).getSize().w;
 				}
 				
-				// Draw a specific tile from the sheet based on the tile state
-				//if (curMap->getTiles()->at(i).getState() == 1) {
-				//	tR2.x = 0;
-				//	tR2.y = 0;
-				//}
-				//if (curMap->getTiles()->at(i).getState() == 2) {
-				//	tR2.x = 32;
-				//	tR2.y = 0;
-				//}
-				//if (curMap->getTiles()->at(i).getState() == 3) {
-				//	tR2.x = 64;
-				//	tR2.y = 0;
-				//}
-				//if (curMap->getTiles()->at(i).getState() == 4) {
-				//	tR2.x = 0;
-				//	tR2.y = 32;
-				//}
-				//if (curMap->getTiles()->at(i).getState() == 5) {
-				//	tR2.x = 32;
-				//	tR2.y = 32;
-				//}
-				//if (curMap->getTiles()->at(i).getState() == 6) {
-				//	tR2.x = 64;
-				//	tR2.y = 32;
-				//}
-
-				
-				tR2.w = 32;
-				tR2.h = 32;
+				tR2.w = curMap->getTiles()->at(i).getSize().w;
+				tR2.h = curMap->getTiles()->at(i).getSize().w;
 
 				SDL_RenderCopy(rend, curMap->getSheet()->getTexture(), &tR2, &tR);
 			}
