@@ -202,6 +202,8 @@ void App::exit() {
 	cout << "Freeing surfaces and window\nExiting SDL" << endl;
 }
 
+// please work!
+
 int main(int argc, char* argv[]) {
 	App myApp = App();
 	myApp.init();
