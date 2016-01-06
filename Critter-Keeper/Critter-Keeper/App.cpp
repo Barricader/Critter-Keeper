@@ -90,7 +90,7 @@ void App::update() {
 				yOffset += 3;
 			}
 		}
-
+		// HI! :-)
 		// Render loop
 		SDL_RenderClear(rend);
 
