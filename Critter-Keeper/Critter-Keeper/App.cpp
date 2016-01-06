@@ -97,7 +97,11 @@ void App::update() {
 		// get the path from the curMap
 		// render each tile here, have the tile sprite based on the state
 		// e.g. if state == 2 then draw tile 0,TILESIZE (where TILESIZe is the size of the tile) on the spritesheet
-		// We are assuming that the tile width is the same as the tile height
+		// We are assuming that the tile width is the same as the tile height   !!Maybe not!!
+		
+		// TODO: put this someone where it will only be set once to save cycles
+		int totalSprites = (curMap->getSheet()->getSize()->w * curMap->getSheet()->getSize()->h) / (curMap->getTiles()->at(0).getSize().w * curMap->getTiles()->at(0).getSize().h);
+
 		for (int i = 0; i < curMap->getTiles()->size(); i++) {
 			if (curMap->getTiles()->at(i).getPos().dX - xOffset + curMap->getTiles()->at(i).getSize().w > 0 ||
 				curMap->getTiles()->at(i).getPos().dX - xOffset < WIDTH ||
@@ -111,14 +115,12 @@ void App::update() {
 
 				SDL_Rect tR2;
 
-				// TODO: create this where the x and ys are not hard coded but are gotten from the json and calculated by the sprite sheet widht and height
 				int tW;
 				int tH;
 				SDL_QueryTexture(curMap->getSheet()->getTexture(), NULL, NULL, &tW, &tH);
 
-				// TODO: Added an error check where it makes sure that the state is not greater than or equal to the max amount of tlies in the sheet from the json
-
-				if (curMap->getTiles()->at(i).getState() != 0) {
+				// Checks the state of a tile and sets the sprite from the spritesheet to use for that tile
+				if (curMap->getTiles()->at(i).getState() != 0 && curMap->getTiles()->at(i).getState() <= totalSprites) {
 					//cout << (curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w << endl;
 					tR2.x = ((curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w) % curMap->getSheet()->getSize()->w;
 					tR2.y = (((curMap->getTiles()->at(i).getState() - 1) * curMap->getTiles()->at(i).getSize().w) / curMap->getSheet()->getSize()->w)  * curMap->getTiles()->at(i).getSize().w;
@@ -182,7 +184,7 @@ void App::exit() {
 	SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow(window);
 
-	/*&	TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+	/*	TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 	*
 	*	Make sure to free up all the textures and well, basically everything that is on the heap
 	*	This should prevent memory leaks and make the program run smoother in the future
